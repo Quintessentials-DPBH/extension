@@ -42,25 +42,32 @@ function scrape() {
   })
     .then((resp) => resp.json())
     .then((data) => {
-      data = data.replace(/'/g, '"');
-      json = JSON.parse(data);
+      data = data["result"];
+      // data = data.replace(/'/g, '"');
+      // json = JSON.parse(data);
       let dp_count = 0;
       let element_index = 0;
-
+      const regex = /^.{0,2}\d+(,\d{2,3})*$/g;
       for (let i = 0; i < elements.length; i++) {
         let text = elements[i].innerText?.trim().replace(/\t/g, " ");
         if (text && text.length == 0) {
           continue;
         }
-
-        if (json.result[i] !== "Not Dark") {
-          highlight(elements[element_index], json.result[i]);
-          dp_count++;
+        for (const marked_text of data) {
+          if (regex.test(marked_text)) continue;
+          console.log(marked_text, text, marked_text == text);
+          if (marked_text == text) {
+            highlight(elements[element_index], "Sneaking");
+          }
         }
+        // if (json.result[i] !== "Not Dark") {
+        //   highlight(elements[element_index], json.result[i]);
+        //   dp_count++;
+        // }
         element_index++;
       }
-
-      // store number of dark patterns
+      dp_count = data.length;
+      // store number of d  ark patterns
       let g = document.createElement("div");
       g.id = "style_count";
       g.value = dp_count;
